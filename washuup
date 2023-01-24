@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euf
+TMP=$(mktemp /tmp/.mm.XXXXXX)
+clean() { rm -f ${TMP}; }
+trap clean EXIT
+
+TARGET_OS=${TARGET_OS:-linux}
+TARGET_ARCH=${TARGET_ARCH:-amd64}
+
+declare -A cache
+
+ARGS=${@:-""}
+[[ -z ${ARGS} ]] && {
+    echo "need a yaml file in argument"
+    exit 1
+}
+
+for file in ${ARGS};do
+    (grep -n "image:.*@sha256" ${file} || true) > ${TMP}
+
+    [[ -s ${TMP} ]] || {
+        continue
+    }
+
+    while read -a line;do
+        lino=${line[0]/:/}
+        image=${line[-1]/:/}
+        base=${image%%@*}
+        olddigest=${image##*@}
+        olddigest=${olddigest#sha256}
+        if [[ -n ${cache[$base]-""} ]];then
+            newdigest=${cache[$base]}
+        else
+            newdigest=$(skopeo inspect --override-arch=${TARGET_ARCH} --override-os=${TARGET_OS} --format='{{ .Digest }}' docker://${base})
+            newdigest=${newdigest#sha256:}
+            cache[${base}]=${newdigest}
+        fi
+        if [[ ${newdigest} != ${olddigest} ]];then
+            echo "${file}:${lino}: new digest for ${base} -> ${newdigest}"
+        fi
+    done < ${TMP}
+done
