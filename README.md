@@ -19,7 +19,9 @@ file:LINE: message
 
 so you can plug this in your EDITOR or anything that understand that format
 
-## Demo
+## Screenshot
+
+<img width="1394" alt="image" src="https://user-images.githubusercontent.com/98980/214255139-4585618c-7516-477c-b379-f5b6712233f7.png">
 
 ## Installation
 
