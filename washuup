@@ -9,13 +9,13 @@ TARGET_ARCH=${TARGET_ARCH:-amd64}
 
 declare -A cache
 
-ARGS=${@:-""}
-[[ -z ${ARGS} ]] && {
+ARGS=("${@}")
+[[ -z ${ARGS[*]} ]] && {
 	echo "need a yaml file in argument"
 	exit 1
 }
 
-for file in ${ARGS}; do
+for file in "${ARGS[@]}"; do
 	(grep -n "image:.*@sha256" ${file} || true) >${TMP}
 
 	[[ -s ${TMP} ]] || {
@@ -35,7 +35,7 @@ for file in ${ARGS}; do
 			newdigest=${newdigest#sha256:}
 			cache[${base}]=${newdigest}
 		fi
-		if [[ ${newdigest} != ${olddigest} ]]; then
+		if [[ ${newdigest} != "${olddigest}" ]]; then
 			echo "${file}:${lino}: new digest for ${base} -> ${newdigest}"
 		fi
 	done <${TMP}
