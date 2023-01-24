@@ -1,6 +1,6 @@
 # waashup
 
-Keep your tekton task sha updated
+Keep your tekton task and pipleine images updated
 
 ## Description
 
