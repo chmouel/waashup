@@ -6,9 +6,27 @@ trap clean EXIT
 
 TARGET_OS=${TARGET_OS:-linux}
 TARGET_ARCH=${TARGET_ARCH:-amd64}
+inplace=
 
 declare -A cache
 
+while getopts "hiao:" opt; do
+	case $opt in
+	i) inplace=true ;;
+	o) TARGET_OS=${OPTARG} ;;
+	a) TARGET_ARCH=${OPTARG} ;;
+	h)
+		echo "usage: prog"
+		exit 0
+		;;
+	*)
+		echo "unknown option: -$OPTARG" >&2
+		exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND - 1))
 ARGS=("${@}")
 [[ -z ${ARGS[*]} ]] && {
 	echo "need a yaml file in argument"
@@ -37,6 +55,9 @@ for file in "${ARGS[@]}"; do
 		fi
 		if [[ ${newdigest} != "${olddigest}" ]]; then
 			echo "${file}:${lino}: new digest for ${base} -> ${newdigest}"
+			if [[ ${inplace} == "true" ]]; then
+				sed -i "${lino}s/${olddigest}/${newdigest}/" ${file}
+			fi
 		fi
 	done <${TMP}
 done

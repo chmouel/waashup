@@ -34,14 +34,19 @@ Copy the [shell script](./washuup) somewhere
 
 ## Usage
 
-You only need to pass the yaml files as arguments.
+You simply need to pass the yaml files as argument.
 
-It will try to detect for linux/amd64 platforms by default. If you want another
-platform/os you can set the env variables  `TARGET_OS` `TARGET_ARCH`
+It will try to detect for linux/amd64 platforms by default. 
+If you want another platform/os you can set the env variable  `TARGET_OS`
+`TARGET_ARCH` or set the `-o` (for a `TARGET_OS`) or `-a` (for a `TARGET_ARCH`)
+to redefine them.
+
+It will only print the images that are not up to date. Unless you use the
+option `-i` and it will do the replacement in place.
 
 ## TODO
 
-- Convert it to go to avoid shell quoting issues and better image detection
+- Use python-yaml to go to avoid shell quoting issues and better image detection
 - Handle tags?
 
 ## BUGS
